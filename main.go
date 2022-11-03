@@ -15,6 +15,22 @@ var Data = map[string]interface{}{
 	"IsLogin": false,
 }
 
+type Blog struct {
+	Title     string
+	Post_date string
+	Author    string
+	Content   string
+}
+
+var Blogs = []Blog{
+	{
+		Title:     "Pasar Coding di Indonesia Dinilai Masih Menjanjikan",
+		Post_date: "12 Jul 2021 22:30 WIB",
+		Author:    "Ilham Fathullah",
+		Content:   "Ketimpangan sumber daya manusia (SDM) di sektor digital masih menjadi isu yang belum terpecahkan. Berdasarkan penelitian ManpowerGroup, ketimpangan SDM global, termasuk Indonesia, meningkat dua kali lipat dalam satu dekade terakhir. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quam, molestiae numquam! Deleniti maiores expedita eaque deserunt quaerat! Dicta, eligendi debitis?",
+	},
+}
+
 func main() {
 	route := mux.NewRouter()
 
