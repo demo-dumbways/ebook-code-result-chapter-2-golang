@@ -9,7 +9,8 @@ import (
 )
 
 var Data = map[string]interface{}{
-	"Title": "Personal Web",
+	"Title":   "Personal Web",
+	"IsLogin": false,
 }
 
 func main() {
