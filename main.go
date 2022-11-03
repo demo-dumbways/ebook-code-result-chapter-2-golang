@@ -80,8 +80,13 @@ func blogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	respData := map[string]interface{}{
+		"Data":  Data,
+		"Blogs": Blogs,
+	}
+
 	w.WriteHeader(http.StatusOK)
-	tmpl.Execute(w, Data)
+	tmpl.Execute(w, respData)
 }
 
 func blogDetail(w http.ResponseWriter, r *http.Request) {
