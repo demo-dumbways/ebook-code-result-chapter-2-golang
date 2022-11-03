@@ -45,6 +45,7 @@ func main() {
 	route.HandleFunc("/blog/{id}", blogDetail).Methods("GET")
 	route.HandleFunc("/add-blog", formBlog).Methods("GET")
 	route.HandleFunc("/blog", addBlog).Methods("POST")
+	route.HandleFunc("/delete-blog/{id}", deleteBlog).Methods("GET")
 	route.HandleFunc("/contact-me", contactMe).Methods("GET")
 
 	fmt.Println("Server running on port 5000")
@@ -158,6 +159,16 @@ func addBlog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Blogs = append(Blogs, newBlog)
+
+	http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
+}
+
+func deleteBlog(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	Blogs = append(Blogs[:id], Blogs[id+1:]...)
 
 	http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
 }
