@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
+	"text/template"
 
 	"github.com/gorilla/mux"
 )
@@ -19,6 +19,8 @@ func main() {
 
 	route.HandleFunc("/", helloWorld).Methods("GET")
 	route.HandleFunc("/home", home).Methods("GET")
+	route.HandleFunc("/blog", blogs).Methods("GET")
+	route.HandleFunc("/contact-me", contactMe).Methods("GET")
 
 	fmt.Println("Server running on port 5000")
 	http.ListenAndServe("localhost:5000", route)
@@ -34,6 +36,34 @@ func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	var tmpl, err = template.ParseFiles("views/index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.Execute(w, Data)
+}
+
+func blogs(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	var tmpl, err = template.ParseFiles("views/blog.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.Execute(w, Data)
+}
+
+func contactMe(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	var tmpl, err = template.ParseFiles("views/contact.html")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("message : " + err.Error()))
