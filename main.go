@@ -15,6 +15,8 @@ var Data = map[string]interface{}{
 func main() {
 	route := mux.NewRouter()
 
+	route.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
+
 	route.HandleFunc("/", helloWorld).Methods("GET")
 	route.HandleFunc("/home", home).Methods("GET")
 
