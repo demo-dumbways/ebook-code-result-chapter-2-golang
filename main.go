@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -21,6 +22,7 @@ func main() {
 	route.HandleFunc("/", helloWorld).Methods("GET")
 	route.HandleFunc("/home", home).Methods("GET")
 	route.HandleFunc("/blog", blogs).Methods("GET")
+	route.HandleFunc("/blog/{id}", blogDetail).Methods("GET")
 	route.HandleFunc("/contact-me", contactMe).Methods("GET")
 
 	fmt.Println("Server running on port 5000")
@@ -59,6 +61,27 @@ func blogs(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	tmpl.Execute(w, Data)
+}
+
+func blogDetail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	var tmpl, err = template.ParseFiles("views/blog-detail.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	resp := map[string]interface{}{
+		"Data": Data,
+		"Id":   id,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.Execute(w, resp)
 }
 
 func contactMe(w http.ResponseWriter, r *http.Request) {
