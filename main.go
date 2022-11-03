@@ -101,9 +101,22 @@ func blogDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	BlogDetail := Blog{}
+
+	for i, data := range Blogs {
+		if i == id {
+			BlogDetail = Blog{
+				Title:     data.Title,
+				Post_date: data.Post_date,
+				Author:    data.Author,
+				Content:   data.Content,
+			}
+		}
+	}
+
 	resp := map[string]interface{}{
 		"Data": Data,
-		"Id":   id,
+		"Blog": BlogDetail,
 	}
 
 	w.WriteHeader(http.StatusOK)
