@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -145,6 +146,18 @@ func addBlog(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Title : " + r.PostForm.Get("title"))
 	fmt.Println("Content : " + r.PostForm.Get("content"))
+
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+
+	var newBlog = Blog{
+		Title:     title,
+		Post_date: time.Now().String(),
+		Author:    "Ilham Fathullah",
+		Content:   content,
+	}
+
+	Blogs = append(Blogs, newBlog)
 
 	http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
 }
