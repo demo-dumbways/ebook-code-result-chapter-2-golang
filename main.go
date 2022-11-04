@@ -175,20 +175,15 @@ func addBlog(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Title : " + r.PostForm.Get("title"))
-	fmt.Println("Content : " + r.PostForm.Get("content"))
-
 	title := r.PostForm.Get("title")
 	content := r.PostForm.Get("content")
 
-	var newBlog = Blog{
-		Title:     title,
-		Post_date: time.Now(),
-		Author:    "Ilham Fathullah",
-		Content:   content,
+	_, err = connection.Conn.Exec(context.Background(), "INSERT INTO tb_blog(title, content, image) VALUES ($1,$2,'image.png')", title, content)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
 	}
-
-	Blogs = append(Blogs, newBlog)
 
 	http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
 }
