@@ -93,6 +93,16 @@ func blogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var store = sessions.NewCookieStore([]byte("SESSION_ID"))
+	session, _ := store.Get(r, "SESSION_ID")
+
+	if session.Values["IsLogin"] != true {
+		Data["IsLogin"] = false
+	} else {
+		Data["IsLogin"] = session.Values["IsLogin"].(bool)
+		Data["UserName"] = session.Values["Name"].(string)
+	}
+
 	rows, _ := connection.Conn.Query(context.Background(), "SELECT id, title, image, content, post_date FROM tb_blog ORDER BY id DESC")
 
 	var result []Blog
