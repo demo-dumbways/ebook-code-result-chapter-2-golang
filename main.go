@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"ebookgolang/connection"
+	"ebookgolang/pkg/middleware"
 	"fmt"
 	"html/template"
 	"log"
@@ -44,6 +45,7 @@ func main() {
 
 	// static folder
 	route.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
+	route.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
 
 	// routing
 	route.HandleFunc("/", helloWorld).Methods("GET")
@@ -51,7 +53,7 @@ func main() {
 	route.HandleFunc("/blog", blogs).Methods("GET")
 	route.HandleFunc("/blog/{id}", blogDetail).Methods("GET")
 	route.HandleFunc("/add-blog", formBlog).Methods("GET")
-	route.HandleFunc("/blog", addBlog).Methods("POST")
+	route.HandleFunc("/blog", middleware.UploadFile(addBlog)).Methods("POST")
 	route.HandleFunc("/delete-blog/{id}", deleteBlog).Methods("GET")
 	route.HandleFunc("/contact-me", contactMe).Methods("GET")
 	route.HandleFunc("/register", formRegister).Methods("GET")
@@ -185,7 +187,15 @@ func addBlog(w http.ResponseWriter, r *http.Request) {
 	title := r.PostForm.Get("title")
 	content := r.PostForm.Get("content")
 
-	_, err = connection.Conn.Exec(context.Background(), "INSERT INTO tb_blog(title, content, image) VALUES ($1,$2,'image.png')", title, content)
+	dataContex := r.Context().Value("dataFile")
+	image := dataContex.(string)
+
+	var store = sessions.NewCookieStore([]byte("SESSION_ID"))
+	session, _ := store.Get(r, "SESSION_ID")
+
+	author := session.Values["Id"].(int)
+
+	_, err = connection.Conn.Exec(context.Background(), "INSERT INTO tb_blog(title, content, image, author_id) VALUES ($1,$2,$3,$4)", title, content, image, author)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("message : " + err.Error()))
@@ -306,6 +316,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	session.Values["IsLogin"] = true
 	session.Values["Name"] = user.Name
+	session.Values["Id"] = user.Id
 	session.Options.MaxAge = 10800
 
 	session.AddFlash("Login success", "message")
