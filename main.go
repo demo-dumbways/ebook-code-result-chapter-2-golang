@@ -103,19 +103,18 @@ func blogs(w http.ResponseWriter, r *http.Request) {
 		Data["UserName"] = session.Values["Name"].(string)
 	}
 
-	rows, _ := connection.Conn.Query(context.Background(), "SELECT id, title, image, content, post_date FROM tb_blog ORDER BY id DESC")
+	rows, _ := connection.Conn.Query(context.Background(), "SELECT tb_blog.id, title, image, content, post_date, tb_user.name as author FROM tb_blog LEFT JOIN tb_user ON tb_blog.author_id = tb_user.id  ORDER BY id DESC")
 
 	var result []Blog
 	for rows.Next() {
 		var each = Blog{}
 
-		var err = rows.Scan(&each.Id, &each.Title, &each.Image, &each.Content, &each.Post_date)
+		var err = rows.Scan(&each.Id, &each.Title, &each.Image, &each.Content, &each.Post_date, &each.Author)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
 
-		each.Author = "Ilham Fathullah"
 		each.Format_date = each.Post_date.Format("2 January 2006")
 
 		result = append(result, each)
