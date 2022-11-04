@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,6 +28,13 @@ type Blog struct {
 	Format_date string
 	Author      string
 	Content     string
+}
+
+type User struct {
+	Id       int
+	Name     string
+	Email    string
+	Password string
 }
 
 func main() {
@@ -48,6 +56,8 @@ func main() {
 	route.HandleFunc("/contact-me", contactMe).Methods("GET")
 	route.HandleFunc("/register", formRegister).Methods("GET")
 	route.HandleFunc("/register", register).Methods("POST")
+	route.HandleFunc("/login", formLogin).Methods("GET")
+	route.HandleFunc("/login", login).Methods("POST")
 
 	fmt.Println("Server running on port 5000")
 	http.ListenAndServe("localhost:5000", route)
@@ -239,4 +249,54 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+}
+
+func formLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	var tmpl, err = template.ParseFiles("views/login.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.Execute(w, Data)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email := r.PostForm.Get("email")
+	password := r.PostForm.Get("password")
+
+	user := User{}
+
+	err = connection.Conn.QueryRow(context.Background(), "SELECT * FROM tb_user WHERE email=$1", email).Scan(
+		&user.Id, &user.Name, &user.Email, &user.Password,
+	)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
+
+	var store = sessions.NewCookieStore([]byte("SESSION_ID"))
+	session, _ := store.Get(r, "SESSION_ID")
+
+	session.AddFlash("Login success", "message")
+	session.Save(r, w)
+
+	http.Redirect(w, r, "/home", http.StatusMovedPermanently)
 }
