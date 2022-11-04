@@ -15,7 +15,7 @@ import (
 
 var Data = map[string]interface{}{
 	"Title":   "Personal Web",
-	"IsLogin": false,
+	"IsLogin": true,
 }
 
 type Blog struct {
@@ -193,7 +193,12 @@ func deleteBlog(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
-	Blogs = append(Blogs[:id], Blogs[id+1:]...)
+	_, err := connection.Conn.Exec(context.Background(), "DELETE FROM tb_blog WHERE id=$1", id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
+	}
 
 	http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
 }
