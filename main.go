@@ -295,6 +295,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var store = sessions.NewCookieStore([]byte("SESSION_ID"))
 	session, _ := store.Get(r, "SESSION_ID")
 
+	session.Values["IsLogin"] = true
+	session.Values["Name"] = user.Name
+	session.Options.MaxAge = 10800
+
 	session.AddFlash("Login success", "message")
 	session.Save(r, w)
 
