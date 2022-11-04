@@ -13,6 +13,7 @@
   </head>
 
   <body>
+    <!-- NavBar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-lg">
         <a class="navbar-brand me-5" href="/home">
@@ -28,11 +29,33 @@
             </li>
           </ul>
         </div>
+        <!-- add auth link -->
+        <div class="d-flex pe-2">
+          <ul class="navbar-nav">
+            {{if .Data.IsLogin}}
+            <li class="nav-item">
+              <a href="#" class="nav-link">Hello, {{.Data.UserName}} </a>
+            </li>
+            <li class="nav-item">
+              <a href="/logout" class="nav-link list-active">Logout</a>
+            </li>
+            {{else}}
+            <li class="nav-item">
+              <a href="/register" class="nav-link">Register</a>
+            </li>
+            <li class="nav-item">
+              <a href="/login" class="nav-link">Login</a>
+            </li>
+            {{end}}
+          </ul>
+        </div>
         <div class="d-flex contact-me">
           <a href="/contact-me"> Contact Me </a>
         </div>
       </div>
     </nav>
+    <!-- End Navbar -->
+
     <form class="form-container" action="/blog" method="POST">
       <h1>Create Post Blog</h1>
       <div>
