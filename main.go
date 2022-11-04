@@ -28,21 +28,6 @@ type Blog struct {
 	Content     string
 }
 
-var Blogs = []Blog{
-	{
-		Title:     "Pasar Coding di Indonesia Dinilai Masih Menjanjikan",
-		Post_date: time.Now(),
-		Author:    "Ilham Fathullah",
-		Content:   "Ketimpangan sumber daya manusia (SDM) di sektor digital masih menjadi isu yang belum terpecahkan. Berdasarkan penelitian ManpowerGroup, ketimpangan SDM global, termasuk Indonesia, meningkat dua kali lipat dalam satu dekade terakhir. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quam, molestiae numquam! Deleniti maiores expedita eaque deserunt quaerat! Dicta, eligendi debitis?",
-	},
-	{
-		Title:     "Dumbways.id Tempat Bootcamp Terbaik",
-		Post_date: time.Now(),
-		Author:    "Cintara Surya Elidanto",
-		Content:   "Bootcamp seringkali menjadi sarana seseorang untuk mencapai kesuksesannya terutama dalam bidang IT.",
-	},
-}
-
 func main() {
 	route := mux.NewRouter()
 
