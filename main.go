@@ -135,17 +135,16 @@ func blogDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	BlogDetail := Blog{}
-
-	for i, data := range Blogs {
-		if i == id {
-			BlogDetail = Blog{
-				Title:     data.Title,
-				Post_date: data.Post_date,
-				Author:    data.Author,
-				Content:   data.Content,
-			}
-		}
+	err = connection.Conn.QueryRow(context.Background(), "SELECT id, title, image, content, post_date FROM tb_blog WHERE id=$1", id).Scan(
+		&BlogDetail.Id, &BlogDetail.Title, &BlogDetail.Image, &BlogDetail.Content, &BlogDetail.Post_date)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("message : " + err.Error()))
+		return
 	}
+
+	BlogDetail.Author = "Ilham Fathullah"
+	BlogDetail.Format_date = BlogDetail.Post_date.Format("2 January 2006")
 
 	resp := map[string]interface{}{
 		"Data": Data,
